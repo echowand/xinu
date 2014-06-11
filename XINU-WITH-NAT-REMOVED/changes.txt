@@ -1,0 +1,26 @@
+changes list:
+
+getutime.c
+->line 43 getlocalip(0)
+
+xsh_udpeserver.c
+->line 43
+
+xsh_udpecho
+->line 55
+
+Makefile
+-> line 149-169
+
+prototypes.h
+->line 617-780
+
+tcp.c
+tcp-ntoh —> tcp-ntoh2
+tcp-hton —> tcp-hton2
+
+ip.c
+line 8: uint16 ident = 1;
+
+ip.h
+line 28: extern uint16 ident; /* Datagram IDENT value */
