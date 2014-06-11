@@ -1,0 +1,26 @@
+Hello.  This is a test file that can be used to test the TFTP code
+in Xinu.  It contains ASCII text, but that shouldn't matter -- a
+binary file will work just as well.
+
+The rest of the file is the initial part of the STRUCTURE file
+from the xboot main directory (included here just to pad the file
+size so it requires at least three data packets.
+
+
+                               Applications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           ^      ^                                 |         |
+           |      |                                 |         |
+           |      |                                 V         V
+      udp_recv icmp_recv                       icmp_send  udp_send
+           |    ^                                   |         |
+           |    |                       -------     |         |
+           |    |  ---->ip_enqueue....>| ipout |--------------------
+           |    | |       ^    ^        -------     |         |     |
+           |    | |       |    |           |        |         |     |
+       udp_in icmp_in     |    |           |        |    -----      |
+           ^    ^         |     --------------      |   |           |
+           |    |         |                |  |     |   |           |
+           |    |         |                |  |     |   |           |
+           |    |         |                V  |     V   V           |
+          ip_local<--------------------------------ip_send--------->|

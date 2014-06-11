@@ -1,0 +1,69 @@
+
+
+                               Applications
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ^        ^        ^                                |         |         |
+    |        |        |                                |         |         |
+    |        |        |                                V         V         V
+ udp_recv tcp_recv icmp_recv                       icmp_send  udp_send tcp_send
+    ^       ^         |                                |         |         |
+    |       |      ---                                 |         |         |
+    |       |     |                                    --------->|<--------
+    |       |     |                                              |
+    |       |     |                          -------             |
+    |       |     |   ----->ip_enqueue.....>| ipout |-------------------------
+    |       |     |  |          ^            -------             |            |
+    |       |     |  |          |                                |            |
+  udp_in tcp_in icmp_in         | This path will only used       |            |
+    ^       ^      ^            | if we create a router that     |            |
+    |       |      |            | forwards IP datagrams -- a     |            |
+    |   ----       |            | host simply drops datagrams    |            |
+    |  |           |            | not destined to the local      |            |
+    |  |   --------             | stack                          |            |
+    |  |  |                     |                                V            |
+   ip_local<---------------------------------------------------ip_send------->|
+     ^                          |                                             |
+     |                          |                                             |
+     |                          |    At this level, an incoming packet        |
+     |  ------------------------     has all IP, UDP, TCP, and ICMP           |
+     | |                             headers in host byte order               |
+     | |                                                                      |
+=====================================================================================
+     | |                                                                      |
+     | |                                                                      |
+     | |                      write  A reply is sent by writing               |
+     | |                        ^    to one of the devices                    |
+     | |                        |                                             |
+     | |                        |                                             |
+     | |                        |          At this level, an outgoing packet  |
+    ip_in                    arp_in        has the MAC address and iface      |
+      ^                         ^          filled in, but header fields are   |
+      |                         |          still in host byte order and       |
+      |      ------------------>|          checksums have not yet been        |
+      |     |             ----->|          computed                           |
+      |     |            |      |                                             V
+      |     |            |      |                                           ip_out
+      |     |            |      |                                             |
+      |<------------------------------                                        |
+      |<-----------      |      |     | On input, the iface is filled         |
+      |     |      |     |      |     | in, but only the Ethernet header      |
+      |     |      |     |      |     | is in host byte order; all other      |  
+      |     |      |     |      |     | headers still need to be converted    |
+=====================================================================================
+      |     |      |     |      |     |                                       |
+      -------      -------      -------                                       |
+     | netin |    | netin |    | netin |   (netin uses read to obtain         |
+      -------      -------      -------     a packet from a device)           |
+         ^            ^            ^                                          |
+         |            |            |                                          |
+**********************************************                                |
+* 0 (Ethernet) | 1 (Wi-Fi?)  | 2 (other???)  *                                |
+**********************************************                                V
+         ^            ^            ^           A packet is sent by writing  write
+         |            |            |           to one of the devices
+       DEVICE0     DEVICE1       DEVICE2
+
+A lined box denotes a process; a box surrounded by stars denotes an "interface"
+that stores address information.  Both ipout and ip_send may block for a limited
+time because they call arp_resolve to resolve a next-hop address.

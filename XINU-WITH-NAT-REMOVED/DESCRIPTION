@@ -1,0 +1,11 @@
+This directory contains a version of the forwarding code with NAT
+removed.  It also contains TFTP, and could server as the basis
+for xboot.
+
+We need to clean up the IP code to handle output correctly.
+
+
+Right now, the main program is still set up to call the tftp
+code.  The IP address of the TFTP server in the Xinu lab is
+hardwired (see tftp.h), as is the name of a file to download.
+
