@@ -35,12 +35,17 @@ struct	netpacket	{
 	  byte		net_udpdata[1500-28];/* UDP payload (1500-above) */
 	 };
 		/* NOTE - THIS IS FAKE AND NEEDS TO BE UDPATED */
+	 	/* Attemp to update....*/
 	 struct {
 	  uint16 	net_tcpsport;	/* TCP source protocol port	*/
 	  uint16	net_tcpdport;	/* TCP destination protocol port*/
-	  uint16	net_tcplen;	/* TCP total length		*/
-	  uint16	net_tcpcksum;	/* TCP checksum			*/
-	  byte		net_tcpdata[1500-28];/* TCP payload (1500-above)*/
+	  uint32	net_tcpseq;	/* Sequence number		*/
+	  uint32	net_tcpack;	/* Acknowledgment		*/
+	  uint16	net_tcpcode;	/* Segment type (TCPF_* above)	*/
+	  uint16	net_tcpwindow;	/* Advertised window size	*/
+	  uint16	net_tcpcksum;	/* Segment checksum		*/
+	  uint16	net_tcpurgptr;	/* Urgent pointer		*/
+	  byte		net_tcpdata[1500-42];/* TCP payload (1500-above)*/
 	 };
 	 struct {
 	  byte		net_ictype;	/* ICMP message type		*/

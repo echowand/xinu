@@ -9,7 +9,11 @@
 void	pdump(struct  netpacket *pptr)
 {
 	struct	arppacket *aptr;
-
+	int32	code;				/* code bits in TCP	*/
+	int32	len;				/* TCP header length	*/
+	char	*pch;				/* walks TCP data	*/
+	struct	tcp	*ptcp;			/* TCP header 		*/
+	
 	kprintf("%02x:%02x:%02x:%02x:%02x:%02x >",
 			pptr->net_ethsrc[0],
 			pptr->net_ethsrc[1],
@@ -118,6 +122,52 @@ void	pdump(struct  netpacket *pptr)
 						ntohs(pptr->net_udpdport),
 						ntohs(pptr->net_udplen) - UDP_HDR_LEN);
 				break;
+			} else if (pptr->net_ipproto == IP_TCP) {
+				kprintf("%d.%d.%d.%d > ",
+						(ntohl(pptr->net_ipsrc)>>24)&0xff,
+						(ntohl(pptr->net_ipsrc)>>16)&0xff,
+						(ntohl(pptr->net_ipsrc)>>8)&0xff, 
+						(ntohl(pptr->net_ipsrc)&0xff));
+				kprintf("%d.%d.%d.%d: ",
+						(ntohl(pptr->net_ipdst)>>24)&0xff,
+						(ntohl(pptr->net_ipdst)>>16)&0xff,
+						(ntohl(pptr->net_ipdst)>>8)&0xff, 
+						(ntohl(pptr->net_ipdst)&0xff));
+				kprintf(" TCP: ");
+				code = ntohs(pptr->net_tcpcode);
+				len = (code >> 10) & 0x3c;
+				kprintf("src port %d, dst port %d  hdr len %d [",
+						ntohs(pptr->net_tcpsport),
+						ntohs(pptr->net_tcpdport),
+						len);
+				if (code & TCPF_FIN) {
+					kprintf("F");
+				}
+				if (code & TCPF_SYN) {
+					kprintf("S");
+				}
+				if (code & TCPF_RST) {
+					kprintf("R");
+				}
+				if (code & TCPF_PSH) {
+					kprintf("P");
+				}
+				if (code & TCPF_ACK) {
+					kprintf("A");
+				}
+				if (code & TCPF_URG) {
+					kprintf("U");
+				}
+				kprintf("] seq=%u ack=%u ", htonl(pptr->net_tcpseq),
+						htonl(pptr->net_tcpack));
+				ptcp = (struct tcp *) &pptr->net_tcpsport;
+				pch = ((char *)ptcp) + TCP_NETHLEN(ptcp);
+				len -= TCP_NETHLEN(ptcp);
+				while (len-- > 0) {
+					kprintf(" %02x", 0xff & *pch++ );
+				}
+				kprintf("\n");
+				break;
 			} else if (pptr->net_ipproto == IP_ICMP) {
 				kprintf("proto ICMP (%d), length %d",
 						pptr->net_ipproto, ntohs(pptr->net_iplen));
@@ -164,6 +214,10 @@ void	pdump(struct  netpacket *pptr)
 void	pdumph(struct  netpacket *pptr)
 {
 	struct	arppacket *aptr;
+	int32	code;				/* code bits in TCP	*/
+	int32	len;				/* TCP header length	*/
+	char	*pch;				/* walks TCP data	*/
+	struct	tcp	*ptcp;			/* TCP header 		*/
 
 	kprintf("%02x:%02x:%02x:%02x:%02x:%02x >",
 			pptr->net_ethsrc[0],
@@ -272,6 +326,52 @@ void	pdumph(struct  netpacket *pptr)
 						pptr->net_udpsport,
 						pptr->net_udpdport,
 						pptr->net_udplen - UDP_HDR_LEN);
+				break;
+			} else if (pptr->net_ipproto == IP_TCP) {
+				kprintf("%d.%d.%d.%d > ",
+						(pptr->net_ipsrc>>24)&0xff,
+						(pptr->net_ipsrc>>16)&0xff,
+						(pptr->net_ipsrc>> 8)&0xff, 
+						(pptr->net_ipsrc     &0xff));
+				kprintf("%d.%d.%d.%d: ",
+						(pptr->net_ipdst>>24)&0xff,
+						(pptr->net_ipdst>>16)&0xff,
+						(pptr->net_ipdst >>8)&0xff, 
+						(pptr->net_ipdst     &0xff));
+				kprintf(" TCP: ");
+				code = pptr->net_tcpcode;
+				len = (code >> 10) & 0x3c;
+				kprintf("TCP src port %d, dst port %d  hdr len %d [",
+						pptr->net_tcpsport,
+						pptr->net_tcpdport,
+						len);
+				if (code & TCPF_FIN) {
+					kprintf("F");
+				}
+				if (code & TCPF_SYN) {
+					kprintf("S");
+				}
+				if (code & TCPF_RST) {
+					kprintf("R");
+				}
+				if (code & TCPF_PSH) {
+					kprintf("P");
+				}
+				if (code & TCPF_ACK) {
+					kprintf("A");
+				}
+				if (code & TCPF_URG) {
+					kprintf("U");
+				}
+				kprintf("] seq=%u ack=%u ", pptr->net_tcpseq,
+						pptr->net_tcpack);
+				ptcp = (struct tcp *) &pptr->net_tcpsport;
+				pch = ((char *)ptcp) + TCP_HLEN(ptcp);
+				len -= TCP_HLEN(ptcp);
+				while (len-- > 0) {
+					kprintf(" %02x", 0xff & *pch++ );
+				}
+				kprintf("\n");
 				break;
 			} else if (pptr->net_ipproto == IP_ICMP) {
 				kprintf("proto ICMP (%d), length %d",
