@@ -73,7 +73,7 @@ void	ip_in(
 			freebuf((char *)pktptr);
 			return;
 		}
-		tcp_ntoh(pktptr);
+		tcp_ntoh2(pktptr);
 		break;
 
 	    case IP_ICMP:
