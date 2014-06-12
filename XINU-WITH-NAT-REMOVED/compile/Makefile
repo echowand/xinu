@@ -182,7 +182,8 @@ SHELL_CFILES +=								\
 	xsh_kill.c	xsh_led.c	xsh_memdump.c	xsh_ps.c 	\
 	xsh_ping.c	xsh_sleep.c 	xsh_memstat.c	xsh_date.c	\
 	xsh_arp.c	xsh_ipaddr.c 	xsh_udpecho.c	xsh_udpdump.c	\
-	xsh_bingid.c	xsh_udpeserver.c
+	xsh_bingid.c	xsh_udpeserver.c    xsh_testlocal.c
+
 
 SHELL_CFULL  = ${SHELL_CFILES:%=../shell/%}
 
