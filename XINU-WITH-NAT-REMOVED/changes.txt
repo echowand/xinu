@@ -24,3 +24,9 @@ line 8: uint16 ident = 1;
 
 ip.h
 line 28: extern uint16 ident; /* Datagram IDENT value */
+
+
+
+
+shprototype.h
+61,62: testlocal()
