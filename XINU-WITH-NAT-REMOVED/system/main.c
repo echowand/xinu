@@ -25,7 +25,7 @@ int32	main(void)
 	kprintf("GOT BACK %d\n", retval);
 	p = bigbuf;
 
-	for  (i=0; i<200; i++) {
+	/*for  (i=0; i<200; i++) {
 		kprintf("%07o",((char *)p) - bigbuf);
 		for (j=0; j<4; j++) {
 			kprintf(" %02x",(*p++)& 0xff);
@@ -34,7 +34,7 @@ int32	main(void)
 			kprintf("%02x",(*p++)& 0xff);
 		}
 		kprintf("\n");
-	}
+	}*/
 
 
 	kprintf("\n...creating a shell\n");

@@ -5,7 +5,8 @@
 
 struct	iqentry	ipoqueue;
 
-uint16	ident = 1;
+uint16	ident = 1;	/* datagram IDENT field		*/
+
 /*------------------------------------------------------------------------
  * ip_in - handle an IP packet that has arrived over a network
  *------------------------------------------------------------------------
@@ -232,6 +233,10 @@ void	ip_local(
 	    case IP_UDP:
 		udp_in(pktptr);
 		return;
+		
+		case IP_TCP:
+		tcp_in(pktptr);
+		return;
 
 	    case IP_ICMP:
 		icmp_in(pktptr);
@@ -273,6 +278,20 @@ status	ip_out(
 
 	switch (pktptr->net_ipproto) {
 
+		case IP_TCP:
+
+/*DEBUG*/kprintf("OUT: "); pdumph(pktptr);
+			tcp_hton( (struct tcp*) &pktptr->net_tcpsport );
+
+			/* Compute TCP checksum */
+
+			pktptr->net_tcpcksum = 0;
+			cksum = tcpcksum(
+				(struct ip  *)&pktptr->net_ipvh,
+				(struct tcp *)&pktptr->net_tcpsport);				
+			pktptr->net_tcpcksum = 0xffff & htons(cksum);
+			break;
+			
 	    case IP_UDP:
 
 			pktptr->net_udpcksum = 0;
