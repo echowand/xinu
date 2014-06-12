@@ -43,6 +43,10 @@ void	net_init (void)
 
 	ipoqueue.iqtail = ipoqueue.iqhead = 0;
 	ipoqueue.iqsem = semcreate(0);
+	
+	/* Initialize TCP */
+
+	tcpinit();
 
 	/* Create an IP output process  */
 
