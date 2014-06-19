@@ -28,6 +28,8 @@ void	tcp_in(
 	ptcp = (struct tcp *)((char *)pip + IP_HDR_LEN);
 	len = pip->ip_len;
 
+	tcp_ntoh(ptcp);
+
 	/* Reject broadcast or multicast packets out of hand */
 
 	if ((memcmp(pep->ep_dst,ebcast,ETH_ADDR_LEN)== 0) ||

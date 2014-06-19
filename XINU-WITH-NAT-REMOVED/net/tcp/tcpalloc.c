@@ -48,6 +48,9 @@ struct ep *tcpalloc(
 	pkt->net_ipsrc = ptcb->tcb_lip; /* IP source address		*/
 	pkt->net_ipdst = ptcb->tcb_rip;	/* IP destination address	*/
 
+	//TEMPTING...
+	pkt->net_iface = 0;
+
 	/* Set the TCP port fields in the segment */
 
 	ptcp->tcp_sport = ptcb->tcb_lport;
